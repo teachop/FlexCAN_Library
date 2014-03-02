@@ -1,4 +1,7 @@
-
+// -------------------------------------------------------------
+// a simple Arduino Teensy3.1 CAN driver
+// by teachop
+//
 #include <Arduino.h>
 
 typedef struct CAN_message
