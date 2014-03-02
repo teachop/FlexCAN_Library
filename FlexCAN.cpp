@@ -68,7 +68,7 @@ void FlexCAN::begin(void)
     FLEXCAN0_MBn_ID(loop) = 0;
     FLEXCAN0_MBn_WORD0(loop) = 0;
     FLEXCAN0_MBn_WORD1(loop) = 0;
-	 	FLEXCAN0_RXIMRn(loop) = 0; // no filtering
+    FLEXCAN0_RXIMRn(loop) = 0; // no filtering
   }
   // start the CAN
   FLEXCAN0_MCR &= ~(FLEXCAN_MCR_HALT);
@@ -99,6 +99,9 @@ int FlexCAN::recv(CAN_message *msg)
   msg->len = FLEXCAN_get_length(FLEXCAN0_MBn_CS(sel));       
   msg->ext = (FLEXCAN0_MBn_CS(sel) & FLEXCAN_MB_CS_IDE)? 1:0;
   msg->id  = (FLEXCAN0_MBn_ID(sel) & FLEXCAN_MB_ID_EXT_MASK);
+  if(!msg->ext) {
+    msg->id >>= FLEXCAN_MB_ID_STD_BIT_NO;         
+  }
 
   // copy out message
   uint32_t dataIn = FLEXCAN0_MBn_WORD0(sel);
