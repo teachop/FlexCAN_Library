@@ -1,0 +1,8 @@
+FlexCAN	KEYWORD1
+
+begin	KEYWORD2
+end	KEYWORD2
+recv	KEYWORD2
+send	KEYWORD2
+
+CAN_message	KEYWORD1
