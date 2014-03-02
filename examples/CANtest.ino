@@ -8,6 +8,7 @@
 int led = 13;
 FlexCAN CANbus(125000);
 static CAN_message msg;
+static uint8_t txScale;
 
 
 // -------------------------------------------------------------
@@ -24,15 +25,18 @@ void setup(void)
 // -------------------------------------------------------------
 void loop(void)
 {
-  digitalWrite(led, HIGH);
-  delay(500);
-  digitalWrite(led, LOW);
-  delay(500);
-  for( int loop=0; loop<8; ++loop ) {
-    msg.buf[loop] = 'A'+loop;
+  txScale++;
+  if ( 10 < txScale ) {
+    for( int loop=0; loop<8; ++loop ) {
+      msg.buf[loop] = 'A'+loop;
+    }
+    msg.len = 8;
+    msg.id = 0x555;
+    CANbus.send(&msg);
   }
-  msg.len = 8;
-  msg.id = 0x555;
-  CANbus.send(&msg);
+  digitalWrite(led, CANbus.recv(&msg));
+  delay(25);
+  digitalWrite(led, 0);
+  delay(25);
 }
 

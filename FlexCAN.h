@@ -3,10 +3,10 @@
 
 typedef struct CAN_message
 {
-  uint32_t id;
+  uint32_t id; // can identifier
+  uint8_t ext; // identifier is extended
+  uint8_t len; // length of data
   uint16_t timeout;
-  uint8_t rtr;
-  uint8_t len;
   uint8_t buf[8];
 } CAN_message;
 
@@ -15,10 +15,10 @@ typedef struct CAN_message
 class FlexCAN {
 public:
   FlexCAN(uint32_t baud = 125000);
-  ~FlexCAN(void);
   void begin(void);
-  int send(CAN_message *msg);
-  int recv(CAN_message *msg);
+  void end(void);
+  void send(CAN_message *msg);
+  int  recv(CAN_message *msg);
 
 private:
 };
