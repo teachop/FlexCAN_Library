@@ -13,10 +13,10 @@ Enable the CAN to start actively participating on the CANbus.
 end()
 Disable the CAN from participating on the CANbus.  Pins remain assigned to the alternate function CAN0.
 
-write(msg)
+write(message)
 Send a frame of 1 to 8 bytes using the given identifier.
 
-read(msg)
-Receive a frame into the buffer if available.  read() will return 1 if a frame was copied into the callers buffer, or 0 if no frame is available.
+read(message)
+Receive a frame into "message" if available.  read() will return 1 if a frame was copied into the callers buffer, or 0 if no frame is available.
 
-msg is a pointer to a CAN_message type buffer structure.
+message is a CAN_message type buffer structure.
