@@ -37,7 +37,7 @@ void setup(void)
 // -------------------------------------------------------------
 void loop(void)
 {
-  if ( CANbus.recv(&rxmsg) ) {
+  if ( CANbus.read(&rxmsg) ) {
     digitalWrite(led, 1);
     hexDump( sizeof(rxmsg), (uint8_t *)&rxmsg );
     msg.len = 8;
@@ -45,11 +45,11 @@ void loop(void)
     for( int loop=0; loop<8; ++loop ) {
       msg.buf[loop] = tolower(rxmsg.buf[loop]);
     }
-    CANbus.send(&msg);
-    hexDump( sizeof(msg), (uint8_t *)&msg );
+    CANbus.write(&msg);
+    //hexDump( sizeof(msg), (uint8_t *)&msg );
+    delay(10);
   } else {
     digitalWrite(led, 0);
   }
-  delay(25);
 }
 

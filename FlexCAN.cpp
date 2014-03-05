@@ -86,7 +86,7 @@ void FlexCAN::begin(void)
 
 
 // -------------------------------------------------------------
-int FlexCAN::recv(CAN_message *msg)
+int FlexCAN::read(CAN_message *msg)
 {
   
   if( !(FLEXCAN0_IFLAG1 & (1<<rxb)) ) {
@@ -131,7 +131,7 @@ int FlexCAN::recv(CAN_message *msg)
 
 
 // -------------------------------------------------------------
-void FlexCAN::send(CAN_message *msg)
+void FlexCAN::write(CAN_message *msg)
 {
   FLEXCAN0_MBn_CS(txb) = FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_INACTIVE);
   FLEXCAN0_MBn_ID(txb) = FLEXCAN_MB_ID_IDSTD(msg->id);
