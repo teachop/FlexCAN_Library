@@ -5,8 +5,9 @@
 #include "FlexCAN.h"
 #include "kinetis_flexcan.h"
 
-static const int txb = 0;
-static const int rxb = 4;
+static const int txb = 8; // with default settings, all buffers before this are consumed by the FIFO
+static const int txBuffers = 8;
+static const int rxb = 0;
 
 // -------------------------------------------------------------
 FlexCAN::FlexCAN(uint32_t baud)
@@ -32,6 +33,9 @@ FlexCAN::FlexCAN(uint32_t baud)
     ;
   // disable self-reception
   FLEXCAN0_MCR |= FLEXCAN_MCR_SRX_DIS;
+
+  //enable RX FIFO
+  FLEXCAN0_MCR |= FLEXCAN_MCR_FEN;
 
   // segment timings from freescale loopback test
   if ( 250000 == baud ) {
@@ -63,38 +67,41 @@ void FlexCAN::end(void)
 // -------------------------------------------------------------
 void FlexCAN::begin(void)
 {
-  // initialize message buffers
-  for( int loop=0; loop<16; ++loop ) {
-    FLEXCAN0_MBn_CS(loop) = 0;
-    FLEXCAN0_MBn_ID(loop) = 0;
-    FLEXCAN0_MBn_WORD0(loop) = 0;
-    FLEXCAN0_MBn_WORD1(loop) = 0;
-    FLEXCAN0_RXIMRn(loop) = 0; // no filtering
-  }
   FLEXCAN0_RXMGMASK = 0;
+
+  //enable reception of all messages into the FIFO (filters ignored)
+  FLEXCAN0_RXFGMASK = 0;
+
+
   // start the CAN
   FLEXCAN0_MCR &= ~(FLEXCAN_MCR_HALT);
   // wait till exit of freeze mode
-  while(FLEXCAN0_MCR & FLEXCAN_MCR_FRZ_ACK)
-    ;
+  while(FLEXCAN0_MCR & FLEXCAN_MCR_FRZ_ACK);
+
   // wait till ready 
-  while(FLEXCAN0_MCR & FLEXCAN_MCR_NOT_RDY)
-    ;
-  // enable an rx buffer
-  FLEXCAN0_MBn_CS(rxb) = FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_RX_EMPTY);
+  while(FLEXCAN0_MCR & FLEXCAN_MCR_NOT_RDY);
+
+  //set tx buffers to inactive
+  for (int i = txb; i < txb + txBuffers; i++)
+  {
+    FLEXCAN0_MBn_CS(i) = FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_INACTIVE);
+  }
 }
 
+bool FlexCAN::available(void)
+{
+	//In FIFO mode, the following interrupt flag signals availability of a frame
+	return FLEXCAN0_IFLAG1 & FLEXCAN_IMASK1_BUF5M;
+}
 
 // -------------------------------------------------------------
 int FlexCAN::read(CAN_message &msg)
 {
   
-  if( !(FLEXCAN0_IFLAG1 & (1<<rxb)) ) {
+  if( !available() ) {
     // early EXIT nothing here
     return 0;
   }
-
-  (void)FLEXCAN_get_code(FLEXCAN0_MBn_CS(rxb));
   
   // get identifier and dlc
   msg.len = FLEXCAN_get_length(FLEXCAN0_MBn_CS(rxb));       
@@ -121,23 +128,38 @@ int FlexCAN::read(CAN_message &msg)
     msg.buf[loop] = 0;
   }
 
-  // buffer is free
-  FLEXCAN0_IFLAG1 = (1<<rxb);
-  (void)FLEXCAN0_TIMER;
-  // TODO do I need to write rx EMPTY? doesn't seem so
+  //notify FIFO that message has been read
+  FLEXCAN0_IFLAG1 = FLEXCAN_IMASK1_BUF5M;
 
   return 1;
 }
 
 
 // -------------------------------------------------------------
-void FlexCAN::write(const CAN_message &msg)
+int FlexCAN::write(const CAN_message &msg)
 {
-  FLEXCAN0_MBn_CS(txb) = FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_INACTIVE);
-  FLEXCAN0_MBn_ID(txb) = FLEXCAN_MB_ID_IDSTD(msg.id);
-  FLEXCAN0_MBn_WORD0(txb) = (msg.buf[0]<<24)|(msg.buf[1]<<16)|(msg.buf[2]<<8)|msg.buf[3];
-  FLEXCAN0_MBn_WORD1(txb) = (msg.buf[4]<<24)|(msg.buf[5]<<16)|(msg.buf[6]<<8)|msg.buf[7];  
-  FLEXCAN0_MBn_CS(txb) = FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_ONCE)
+  //find an available buffer
+  int buffer = -1;
+  for (int i = txb; i < txb + txBuffers; i++)
+  {
+    if ((FLEXCAN0_MBn_CS(i) & FLEXCAN_MB_CS_CODE_MASK) == FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_INACTIVE))
+    {
+      buffer = i;
+	  break;
+    }
+  }
+
+  //No buffers available
+  if (buffer < 0)
+	  return 0;
+
+  FLEXCAN0_MBn_CS(buffer) = FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_INACTIVE);
+  FLEXCAN0_MBn_ID(buffer) = FLEXCAN_MB_ID_IDSTD(msg.id);
+  FLEXCAN0_MBn_WORD0(buffer) = (msg.buf[0]<<24)|(msg.buf[1]<<16)|(msg.buf[2]<<8)|msg.buf[3];
+  FLEXCAN0_MBn_WORD1(buffer) = (msg.buf[4]<<24)|(msg.buf[5]<<16)|(msg.buf[6]<<8)|msg.buf[7];  
+  FLEXCAN0_MBn_CS(buffer) = FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_ONCE)
                       | FLEXCAN_MB_CS_LENGTH(msg.len);
+
+  return 1;
 }
 

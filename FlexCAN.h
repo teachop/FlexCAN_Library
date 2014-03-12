@@ -20,7 +20,8 @@ public:
   FlexCAN(uint32_t baud = 125000);
   void begin(void);
   void end(void);
-  void write(const CAN_message &msg);
+  bool available(void);
+  int write(const CAN_message &msg);
   int  read(CAN_message &msg);
 
 private:
