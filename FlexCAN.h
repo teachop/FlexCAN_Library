@@ -4,14 +4,14 @@
 //
 #include <Arduino.h>
 
-typedef struct CAN_message
+typedef struct CAN_message_t
 {
   uint32_t id; // can identifier
   uint8_t ext; // identifier is extended
   uint8_t len; // length of data
   uint16_t timeout;
   uint8_t buf[8];
-} CAN_message;
+} CAN_message_t;
 
 
 // -------------------------------------------------------------
@@ -21,8 +21,8 @@ public:
   void begin(void);
   void end(void);
   bool available(void);
-  int write(const CAN_message &msg);
-  int  read(CAN_message &msg);
+  int write(const CAN_message_t &msg);
+  int read(CAN_message_t &msg);
 
 private:
 };

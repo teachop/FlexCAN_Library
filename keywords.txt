@@ -4,5 +4,6 @@ begin	KEYWORD2
 end	KEYWORD2
 read	KEYWORD2
 write	KEYWORD2
+available	KEYWORD2
 
-CAN_message	KEYWORD1
+CAN_message_t	KEYWORD1

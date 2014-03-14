@@ -82,8 +82,7 @@ void FlexCAN::begin(void)
   while(FLEXCAN0_MCR & FLEXCAN_MCR_NOT_RDY);
 
   //set tx buffers to inactive
-  for (int i = txb; i < txb + txBuffers; i++)
-  {
+  for (int i = txb; i < txb + txBuffers; i++) {
     FLEXCAN0_MBn_CS(i) = FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_INACTIVE);
   }
 }
@@ -95,7 +94,7 @@ bool FlexCAN::available(void)
 }
 
 // -------------------------------------------------------------
-int FlexCAN::read(CAN_message &msg)
+int FlexCAN::read(CAN_message_t &msg)
 {
   
   if( !available() ) {
@@ -136,14 +135,12 @@ int FlexCAN::read(CAN_message &msg)
 
 
 // -------------------------------------------------------------
-int FlexCAN::write(const CAN_message &msg)
+int FlexCAN::write(const CAN_message_t &msg)
 {
   //find an available buffer
   int buffer = -1;
-  for (int i = txb; i < txb + txBuffers; i++)
-  {
-    if ((FLEXCAN0_MBn_CS(i) & FLEXCAN_MB_CS_CODE_MASK) == FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_INACTIVE))
-    {
+  for (int i = txb; i < txb + txBuffers; i++) {
+    if ((FLEXCAN0_MBn_CS(i) & FLEXCAN_MB_CS_CODE_MASK) == FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_INACTIVE)) {
       buffer = i;
 	  break;
     }

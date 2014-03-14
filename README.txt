@@ -14,9 +14,12 @@ end()
 Disable the CAN from participating on the CANbus.  Pins remain assigned to the alternate function CAN0.
 
 write(message)
-Send a frame of 1 to 8 bytes using the given identifier.
+Send a frame of 1 to 8 bytes using the given identifier.  write() will return 0 if no buffer was available for sending.
 
 read(message)
 Receive a frame into "message" if available.  read() will return 1 if a frame was copied into the callers buffer, or 0 if no frame is available.
 
-message is a CAN_message type buffer structure.
+available()
+Returns 1 if at least one receive frame is waiting, or 0 if no frame is available.
+
+message is a CAN_message_t type buffer structure.

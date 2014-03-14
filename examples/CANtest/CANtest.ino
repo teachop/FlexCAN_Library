@@ -7,7 +7,7 @@
 
 int led = 13;
 FlexCAN CANbus(125000);
-static CAN_message msg,rxmsg;
+static CAN_message_t msg,rxmsg;
 static uint8_t hex[17] = "0123456789abcdef";
 
 
