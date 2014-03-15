@@ -72,7 +72,6 @@ void FlexCAN::begin(void)
   //enable reception of all messages into the FIFO (filters ignored)
   FLEXCAN0_RXFGMASK = 0;
 
-
   // start the CAN
   FLEXCAN0_MCR &= ~(FLEXCAN_MCR_HALT);
   // wait till exit of freeze mode
@@ -87,27 +86,37 @@ void FlexCAN::begin(void)
   }
 }
 
-bool FlexCAN::available(void)
+
+// -------------------------------------------------------------
+int FlexCAN::available(void)
 {
-	//In FIFO mode, the following interrupt flag signals availability of a frame
-	return FLEXCAN0_IFLAG1 & FLEXCAN_IMASK1_BUF5M;
+  //In FIFO mode, the following interrupt flag signals availability of a frame
+  return (FLEXCAN0_IFLAG1 & FLEXCAN_IMASK1_BUF5M)? 1:0;
 }
+
 
 // -------------------------------------------------------------
 int FlexCAN::read(CAN_message_t &msg)
 {
-  
-  if( !available() ) {
-    // early EXIT nothing here
-    return 0;
+  unsigned long int startMillis;
+  if ( msg.timeout ) {
+    startMillis = millis();
+  }
+
+  while( !available() ) {
+    if ( !msg.timeout || (msg.timeout<=(millis()-startMillis)) ) {
+      // early EXIT nothing here
+      return 0;
+    }
+    yield();
   }
   
   // get identifier and dlc
-  msg.len = FLEXCAN_get_length(FLEXCAN0_MBn_CS(rxb));       
+  msg.len = FLEXCAN_get_length(FLEXCAN0_MBn_CS(rxb));
   msg.ext = (FLEXCAN0_MBn_CS(rxb) & FLEXCAN_MB_CS_IDE)? 1:0;
   msg.id  = (FLEXCAN0_MBn_ID(rxb) & FLEXCAN_MB_ID_EXT_MASK);
   if(!msg.ext) {
-    msg.id >>= FLEXCAN_MB_ID_STD_BIT_NO;         
+    msg.id >>= FLEXCAN_MB_ID_STD_BIT_NO;
   }
 
   // copy out message
@@ -137,23 +146,36 @@ int FlexCAN::read(CAN_message_t &msg)
 // -------------------------------------------------------------
 int FlexCAN::write(const CAN_message_t &msg)
 {
-  //find an available buffer
+  unsigned long int startMillis;
+  if ( msg.timeout ) {
+    startMillis = millis();
+  }
+  
+  // find an available buffer
   int buffer = -1;
-  for (int i = txb; i < txb + txBuffers; i++) {
-    if ((FLEXCAN0_MBn_CS(i) & FLEXCAN_MB_CS_CODE_MASK) == FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_INACTIVE)) {
-      buffer = i;
-	  break;
+  for ( int index = txb; ; ) {
+    if ((FLEXCAN0_MBn_CS(index) & FLEXCAN_MB_CS_CODE_MASK) == FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_INACTIVE)) {
+      buffer = index;
+      break;// found one
+    }
+    if ( !msg.timeout ) {
+      if ( ++index >= (txb+txBuffers) ) {
+        return 0;// early EXIT no buffers available
+      }
+    } else {
+      // blocking mode, only 1 txb used to guarantee frames in order
+      if ( msg.timeout <= (millis()-startMillis) ) {
+        return 0;// timed out
+      }
+      yield();
     }
   }
 
-  //No buffers available
-  if (buffer < 0)
-	  return 0;
-
+  // transmit the frame
   FLEXCAN0_MBn_CS(buffer) = FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_INACTIVE);
   FLEXCAN0_MBn_ID(buffer) = FLEXCAN_MB_ID_IDSTD(msg.id);
   FLEXCAN0_MBn_WORD0(buffer) = (msg.buf[0]<<24)|(msg.buf[1]<<16)|(msg.buf[2]<<8)|msg.buf[3];
-  FLEXCAN0_MBn_WORD1(buffer) = (msg.buf[4]<<24)|(msg.buf[5]<<16)|(msg.buf[6]<<8)|msg.buf[7];  
+  FLEXCAN0_MBn_WORD1(buffer) = (msg.buf[4]<<24)|(msg.buf[5]<<16)|(msg.buf[6]<<8)|msg.buf[7];
   FLEXCAN0_MBn_CS(buffer) = FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_ONCE)
                       | FLEXCAN_MB_CS_LENGTH(msg.len);
 
