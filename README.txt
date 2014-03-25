@@ -1,5 +1,8 @@
 A simple-to-use Arduino library for CANbus on Teensy 3.1
 
+Status: Working.  New features: Extended identifiers and receive filtering have just been contributed, please help test and give feedback.
+
+
 FlexCAN is a driver for the CAN0 peripheral built into the Teensy 3.1 CPU.  
 
 When the FlexCAN object is constructed, Arduino pins Digital 3 and Digital 4 (module connections 5 and 6) are assigned to CAN functions.  These should be wired to a 3.3V CAN transceiver TXD and RXD respectively.
