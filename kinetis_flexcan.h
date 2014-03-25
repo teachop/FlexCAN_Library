@@ -80,7 +80,7 @@ typedef volatile uint32_t vuint32_t;
 #define FLEXCAN0_DBG2                  (*(vuint32_t*)(FLEXCAN0_BASE+0x5C))
 
 #define FLEXCAN0_IMEUR                 FLEXCAN0_FUREQ
-#define FLEXCAN0_LRFR                  FLEXCAN0_FUACK					
+#define FLEXCAN0_LRFR                  FLEXCAN0_FUACK
 
 
 /* Message Buffers */
@@ -89,7 +89,7 @@ typedef volatile uint32_t vuint32_t;
 #define FLEXCAN0_MB0_WORD0             (*(vuint32_t*)(FLEXCAN0_BASE+0x88))
 #define FLEXCAN0_MB0_WORD1             (*(vuint32_t*)(FLEXCAN0_BASE+0x8C))
 
-#define FLEXCAN0_MBn_CS(n)			(*(vuint32_t*)(FLEXCAN0_BASE+0x80+n*0x10))	
+#define FLEXCAN0_MBn_CS(n)			(*(vuint32_t*)(FLEXCAN0_BASE+0x80+n*0x10))
 #define FLEXCAN0_MBn_ID(n)			(*(vuint32_t*)(FLEXCAN0_BASE+0x84+n*0x10))
 #define FLEXCAN0_MBn_WORD0(n)		(*(vuint32_t*)(FLEXCAN0_BASE+0x88+n*0x10))
 #define FLEXCAN0_MBn_WORD1(n)		(*(vuint32_t*)(FLEXCAN0_BASE+0x8C+n*0x10))
@@ -158,7 +158,7 @@ typedef volatile uint32_t vuint32_t;
 #define FLEXCAN1_DBG2                  (*(vuint32_t*)(FLEXCAN1_BASE+0x5C))
 
 #define FLEXCAN1_IMEUR                 FLEXCAN1_FUREQ
-#define FLEXCAN1_LRFR                  FLEXCAN1_FUACK					
+#define FLEXCAN1_LRFR                  FLEXCAN1_FUACK
 
 /* Message Buffers */
 #define FLEXCAN1_MB0_CS                (*(vuint32_t*)(FLEXCAN1_BASE+0x80))
@@ -166,7 +166,7 @@ typedef volatile uint32_t vuint32_t;
 #define FLEXCAN1_MB0_WORD0             (*(vuint32_t*)(FLEXCAN1_BASE+0x88))
 #define FLEXCAN1_MB0_WORD1             (*(vuint32_t*)(FLEXCAN1_BASE+0x8C))
 
-#define FLEXCAN1_MBn_CS(n)		        (*(vuint32_t*)(FLEXCAN1_BASE+0x80+n*0x10))	
+#define FLEXCAN1_MBn_CS(n)		        (*(vuint32_t*)(FLEXCAN1_BASE+0x80+n*0x10))
 #define FLEXCAN1_MBn_ID(n)				(*(vuint32_t*)(FLEXCAN1_BASE+0x84+n*0x10))
 #define FLEXCAN1_MBn_WORD0(n)			(*(vuint32_t*)(FLEXCAN1_BASE+0x88+n*0x10))
 #define FLEXCAN1_MBn_WORD1(n)			(*(vuint32_t*)(FLEXCAN1_BASE+0x8C+n*0x10))
@@ -181,7 +181,7 @@ typedef volatile uint32_t vuint32_t;
 #define FLEXCAN1_IDFLT_TAB(n)		(*(vuint32_t*)(FLEXCAN1_BASE+0xE0+(n<<2)))
 
 /* Memory Error Control Register */
-#define FLEXCAN1_MECR					*(vuint32_t*)(FLEXCAN1_BASE+0x7B70))	
+#define FLEXCAN1_MECR					*(vuint32_t*)(FLEXCAN1_BASE+0x7B70))
 
 /* Error Injection Address Register */
 #define FLEXCAN1_ERRIAR					*(vuint32_t*)(FLEXCAN1_BASE+0x3B74))
@@ -410,7 +410,7 @@ typedef volatile uint32_t vuint32_t;
 #define FLEXCAN_ESR2_LOSTRLF			(0x00000004)
 #define FLEXCAN_ESR2_LOSTRMF			(0x00000002)
 #define FLEXCAN_ESR2_IMEUF				(0x00000001)
-#define FLEXCAN_get_LTM(esr2_value)	(((esr2_value) & (FLEXCAN_ESR2_LTM))>>(FLEXCAN_ESR2_LTM_BIT_NO))		
+#define FLEXCAN_get_LTM(esr2_value)	(((esr2_value) & (FLEXCAN_ESR2_LTM))>>(FLEXCAN_ESR2_LTM_BIT_NO))
 
 /* Bit definitions and macros for FLEXCAN_IMASK1 */
 #define FLEXCAN_IMASK1_BUF0M           (0x00000001)
@@ -1086,7 +1086,7 @@ typedef volatile uint32_t vuint32_t;
 #define FLEXCAN_IMEUR_IMEUP_BIT_NO	(0)
 #define FLEXCAN_IMEUR_IMEUREQ_MASK	(0x00000100)
 #define FLEXCAN_IMEUR_IMEUACK_MASK	(0x00000200)
-#define FLEXCAN_Set_IMEUP(imeur,imeup)	imeur = (imeur & ~(FLEXCAN_IMEUR_IMEUP_MASK)) | (imeup & FLEXCAN_IMEUR_IMEUP_MASK)  
+#define FLEXCAN_Set_IMEUP(imeur,imeup)	imeur = (imeur & ~(FLEXCAN_IMEUR_IMEUP_MASK)) | (imeup & FLEXCAN_IMEUR_IMEUP_MASK)
 #define FLEXCAN_Get_IMEUP(imeur)	(imeur & FLEXCAN_IMEUR_IMEUP_MASK)
 
 /* Bit definition for Lost Rx Frames Register (LRFR)
@@ -1099,7 +1099,7 @@ typedef volatile uint32_t vuint32_t;
 #define FLEXCAN_LRFR_LOSTRMP_BIT_NO		(0)
 #define FLEXCAN_Get_LostMBLocked(lrfr)	((lrfr & FLEXCAN_LRFR_LOSTRLP_MASK)>>(FLEXCAN_LRFR_LOSTRLP_BIT_NO))
 #define FLEXCAN_Get_LostMBUpdated(lrfr)	((lrfr & FLEXCAN_LRFR_LOSTRMP_MASK))
- 
+
 /* Bit definition for Memory Error Control Register */
 #define FLEXCAN_MECR_NCEFAFRZ_MASK	(0x00000080)
 #define FLEXCAN_MECR_RERRDIS_MASK	(0x00000100)
@@ -1110,24 +1110,24 @@ typedef volatile uint32_t vuint32_t;
 #define FLEXCAN_MECR_FANCEI_MSK_MAKS	(0x00040000)
 #define FLEXCAN_MECR_HANCEI_MSK_MAKS	(0x00080000)
 #define FLEXCAN_MECR_ECRWRDIS_MSK_MAKS	(0x80000000)
- 
+
 /* Bit definition for Error Report Address Register (RERRAR) */
 #define FLEXCAN_RERRAR_NCE_MASK		(0x01000000)
 #define FLEXCAN_RERRAR_SAID_MASK	(0x00070000)
-#define FLEXCAN_ERRADDR_MASK		(0x00003FFF) 
+#define FLEXCAN_ERRADDR_MASK		(0x00003FFF)
 
 /* Bit definition for Error Report Syndrome Register (RERRSYNR) */
 #define FLEXCAN_RERRSYNR_BE3_MASK	(0x80000000)
 #define FLEXCAN_RERRSYNR_SYND3_MASK	(0x1F000000)
 #define FLEXCAN_RERRSYNR_SYND3_BIT_NO	(24)
-#define FLEXCAN_RERRSYNR_BE2_MASK	(0x00800000) 
-#define FLEXCAN_RERRSYNR_SYND2_MASK	(0x001F0000) 
+#define FLEXCAN_RERRSYNR_BE2_MASK	(0x00800000)
+#define FLEXCAN_RERRSYNR_SYND2_MASK	(0x001F0000)
 #define FLEXCAN_RERRSYNR_SYND2_BIT_NO	(16)
 #define FLEXCAN_RERRSYNR_BE1_MASK	(0x00008000)
 #define FLEXCAN_RERRSYNR_SYND1_MASK	(0x00001F00)
 #define FLEXCAN_RERRSYNR_SYND1_BIT_NO	(8)
-#define FLEXCAN_RERRSYNR_BE0_MASK	(0x00000080) 
-#define FLEXCAN_RERRSYNR_SYND0_MASK	(0x0000001F) 
+#define FLEXCAN_RERRSYNR_BE0_MASK	(0x00000080)
+#define FLEXCAN_RERRSYNR_SYND0_MASK	(0x0000001F)
 #define FLEXCAN_RERRSYNR_SYND0_BIT_NO	(0)
 
 #define FLEXCAN_RERRSYNR_check_BEn_Bit(errsynr,n) (errsynr & FLEXCAN_RERRSYNR_BE##n##_MASK)
@@ -1142,6 +1142,6 @@ typedef volatile uint32_t vuint32_t;
 #define FLEXCAN_ERRSR_FANCEIF_MASK	(0x00040000)
 #define FLEXCAN_ERRSR_HANCEIF_MASK	(0x00080000)
 
- 
+
 /********************************************************************/
 #endif // __KINETIS_FLEXCAN_H

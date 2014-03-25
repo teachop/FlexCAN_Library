@@ -23,7 +23,8 @@ unsigned int txTimer,rxTimer;
 
 
 // -------------------------------------------------------------
-static void hexDump(uint8_t dumpLen, uint8_t *bytePtr) {
+static void hexDump(uint8_t dumpLen, uint8_t *bytePtr)
+{
   uint8_t working;
   while( dumpLen-- ) {
     working = *bytePtr++;
@@ -44,7 +45,7 @@ void setup(void)
 
   delay(1000);
   Serial.println(F("Hello Teensy 3.1 CAN Test."));
-  
+
   sysTimer.reset();
 }
 
@@ -54,10 +55,14 @@ void loop(void)
 {
   // service software timers based on Metro tick
   if ( sysTimer.check() ) {
-    if ( txTimer ) --txTimer;
-    if ( rxTimer ) --rxTimer;
+    if ( txTimer ) {
+      --txTimer;
+    }
+    if ( rxTimer ) {
+      --rxTimer;
+    }
   }
-  
+
   // if not time-delayed, read CAN messages and print 1st byte
   if ( !rxTimer ) {
     while ( CANbus.read(rxmsg) ) {

@@ -40,16 +40,16 @@ FlexCAN::FlexCAN(uint32_t baud)
   // segment timings from freescale loopback test
   if ( 250000 == baud ) {
     FLEXCAN0_CTRL1 = (FLEXCAN_CTRL_PROPSEG(2) | FLEXCAN_CTRL_RJW(1)
-                    | FLEXCAN_CTRL_PSEG1(3) | FLEXCAN_CTRL_PSEG2(3) | FLEXCAN_CTRL_PRESDIV(15));
+                      | FLEXCAN_CTRL_PSEG1(3) | FLEXCAN_CTRL_PSEG2(3) | FLEXCAN_CTRL_PRESDIV(15));
   } else if ( 500000 == baud ) {
     FLEXCAN0_CTRL1 = (FLEXCAN_CTRL_PROPSEG(2) | FLEXCAN_CTRL_RJW(1)
-                    | FLEXCAN_CTRL_PSEG1(3) | FLEXCAN_CTRL_PSEG2(3) | FLEXCAN_CTRL_PRESDIV(7));
+                      | FLEXCAN_CTRL_PSEG1(3) | FLEXCAN_CTRL_PSEG2(3) | FLEXCAN_CTRL_PRESDIV(7));
   } else if ( 1000000 == baud ) {
     FLEXCAN0_CTRL1 = (FLEXCAN_CTRL_PROPSEG(3) | FLEXCAN_CTRL_RJW(0)
-                    | FLEXCAN_CTRL_PSEG1(0) | FLEXCAN_CTRL_PSEG2(1) | FLEXCAN_CTRL_PRESDIV(5));
+                      | FLEXCAN_CTRL_PSEG1(0) | FLEXCAN_CTRL_PSEG2(1) | FLEXCAN_CTRL_PRESDIV(5));
   } else { // 125000
     FLEXCAN0_CTRL1 = (FLEXCAN_CTRL_PROPSEG(2) | FLEXCAN_CTRL_RJW(2)
-                    | FLEXCAN_CTRL_PSEG1(3) | FLEXCAN_CTRL_PSEG2(3) | FLEXCAN_CTRL_PRESDIV(31));
+                      | FLEXCAN_CTRL_PSEG1(3) | FLEXCAN_CTRL_PSEG2(3) | FLEXCAN_CTRL_PRESDIV(31));
   }
 
   // Default mask is allow everything
@@ -75,17 +75,18 @@ void FlexCAN::begin(const CAN_filter_t &mask)
   FLEXCAN0_RXMGMASK = 0;
 
   //enable reception of all messages that fit the mask
-  if (mask.ext)
+  if (mask.ext) {
     FLEXCAN0_RXFGMASK = ((mask.rtr?1:0) << 31) | ((mask.ext?1:0) << 30) | ((mask.id & FLEXCAN_MB_ID_EXT_MASK) << 1);
-  else
+  } else {
     FLEXCAN0_RXFGMASK = ((mask.rtr?1:0) << 31) | ((mask.ext?1:0) << 30) | (FLEXCAN_MB_ID_IDSTD(mask.id) << 1);
+  }
 
   // start the CAN
   FLEXCAN0_MCR &= ~(FLEXCAN_MCR_HALT);
   // wait till exit of freeze mode
   while(FLEXCAN0_MCR & FLEXCAN_MCR_FRZ_ACK);
 
-  // wait till ready 
+  // wait till ready
   while(FLEXCAN0_MCR & FLEXCAN_MCR_NOT_RDY);
 
   //set tx buffers to inactive
@@ -99,10 +100,11 @@ void FlexCAN::begin(const CAN_filter_t &mask)
 void FlexCAN::setFilter(const CAN_filter_t &filter, uint8_t n)
 {
   if ( 8 > n ) {
-    if (filter.ext)
+    if (filter.ext) {
       FLEXCAN0_IDFLT_TAB(n) = ((filter.rtr?1:0) << 31) | ((filter.ext?1:0) << 30) | ((filter.id & FLEXCAN_MB_ID_EXT_MASK) << 1);
-    else
+    } else {
       FLEXCAN0_IDFLT_TAB(n) = ((filter.rtr?1:0) << 31) | ((filter.ext?1:0) << 30) | (FLEXCAN_MB_ID_IDSTD(filter.id) << 1);
+    }
   }
 }
 
@@ -130,7 +132,7 @@ int FlexCAN::read(CAN_message_t &msg)
     }
     yield();
   }
-  
+
   // get identifier and dlc
   msg.len = FLEXCAN_get_length(FLEXCAN0_MBn_CS(rxb));
   msg.ext = (FLEXCAN0_MBn_CS(rxb) & FLEXCAN_MB_CS_IDE)? 1:0;
@@ -141,15 +143,21 @@ int FlexCAN::read(CAN_message_t &msg)
 
   // copy out message
   uint32_t dataIn = FLEXCAN0_MBn_WORD0(rxb);
-  msg.buf[3] = dataIn; dataIn >>=8;
-  msg.buf[2] = dataIn; dataIn >>=8;
-  msg.buf[1] = dataIn; dataIn >>=8;
+  msg.buf[3] = dataIn;
+  dataIn >>=8;
+  msg.buf[2] = dataIn;
+  dataIn >>=8;
+  msg.buf[1] = dataIn;
+  dataIn >>=8;
   msg.buf[0] = dataIn;
   if ( 4 < msg.len ) {
     dataIn = FLEXCAN0_MBn_WORD1(rxb);
-    msg.buf[7] = dataIn; dataIn >>=8;
-    msg.buf[6] = dataIn; dataIn >>=8;
-    msg.buf[5] = dataIn; dataIn >>=8;
+    msg.buf[7] = dataIn;
+    dataIn >>=8;
+    msg.buf[6] = dataIn;
+    dataIn >>=8;
+    msg.buf[5] = dataIn;
+    dataIn >>=8;
     msg.buf[4] = dataIn;
   }
   for( int loop=msg.len; loop<8; ++loop ) {
@@ -170,7 +178,7 @@ int FlexCAN::write(const CAN_message_t &msg)
   if ( msg.timeout ) {
     startMillis = millis();
   }
-  
+
   // find an available buffer
   int buffer = -1;
   for ( int index = txb; ; ) {
@@ -202,10 +210,10 @@ int FlexCAN::write(const CAN_message_t &msg)
   FLEXCAN0_MBn_WORD1(buffer) = (msg.buf[4]<<24)|(msg.buf[5]<<16)|(msg.buf[6]<<8)|msg.buf[7];
   if(msg.ext) {
     FLEXCAN0_MBn_CS(buffer) = FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_ONCE)
-                      | FLEXCAN_MB_CS_LENGTH(msg.len) | FLEXCAN_MB_CS_SRR | FLEXCAN_MB_CS_IDE;
+                              | FLEXCAN_MB_CS_LENGTH(msg.len) | FLEXCAN_MB_CS_SRR | FLEXCAN_MB_CS_IDE;
   } else {
     FLEXCAN0_MBn_CS(buffer) = FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_ONCE)
-                      | FLEXCAN_MB_CS_LENGTH(msg.len);
+                              | FLEXCAN_MB_CS_LENGTH(msg.len);
   }
 
   return 1;
