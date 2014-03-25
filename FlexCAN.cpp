@@ -51,6 +51,11 @@ FlexCAN::FlexCAN(uint32_t baud)
     FLEXCAN0_CTRL1 = (FLEXCAN_CTRL_PROPSEG(2) | FLEXCAN_CTRL_RJW(2)
                     | FLEXCAN_CTRL_PSEG1(3) | FLEXCAN_CTRL_PSEG2(3) | FLEXCAN_CTRL_PRESDIV(31));
   }
+
+  // Default mask is allow everything
+  defaultMask.rtr = 0;
+  defaultMask.ext = 0;
+  defaultMask.id = 0;
 }
 
 
@@ -65,12 +70,15 @@ void FlexCAN::end(void)
 
 
 // -------------------------------------------------------------
-void FlexCAN::begin(void)
+void FlexCAN::begin(const CAN_filter_t &mask)
 {
   FLEXCAN0_RXMGMASK = 0;
 
-  //enable reception of all messages into the FIFO (filters ignored)
-  FLEXCAN0_RXFGMASK = 0;
+  //enable reception of all messages that fit the mask
+  if (mask.ext)
+    FLEXCAN0_RXFGMASK = ((mask.rtr?1:0) << 31) | ((mask.ext?1:0) << 30) | ((mask.id & FLEXCAN_MB_ID_EXT_MASK) << 1);
+  else
+    FLEXCAN0_RXFGMASK = ((mask.rtr?1:0) << 31) | ((mask.ext?1:0) << 30) | (FLEXCAN_MB_ID_IDSTD(mask.id) << 1);
 
   // start the CAN
   FLEXCAN0_MCR &= ~(FLEXCAN_MCR_HALT);
@@ -83,6 +91,18 @@ void FlexCAN::begin(void)
   //set tx buffers to inactive
   for (int i = txb; i < txb + txBuffers; i++) {
     FLEXCAN0_MBn_CS(i) = FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_INACTIVE);
+  }
+}
+
+
+// -------------------------------------------------------------
+void FlexCAN::setFilter(const CAN_filter_t &filter, uint8_t n)
+{
+  if ( 8 > n ) {
+    if (filter.ext)
+      FLEXCAN0_IDFLT_TAB(n) = ((filter.rtr?1:0) << 31) | ((filter.ext?1:0) << 30) | ((filter.id & FLEXCAN_MB_ID_EXT_MASK) << 1);
+    else
+      FLEXCAN0_IDFLT_TAB(n) = ((filter.rtr?1:0) << 31) | ((filter.ext?1:0) << 30) | (FLEXCAN_MB_ID_IDSTD(filter.id) << 1);
   }
 }
 
@@ -173,11 +193,20 @@ int FlexCAN::write(const CAN_message_t &msg)
 
   // transmit the frame
   FLEXCAN0_MBn_CS(buffer) = FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_INACTIVE);
-  FLEXCAN0_MBn_ID(buffer) = FLEXCAN_MB_ID_IDSTD(msg.id);
+  if(msg.ext) {
+    FLEXCAN0_MBn_ID(buffer) = (msg.id & FLEXCAN_MB_ID_EXT_MASK);
+  } else {
+    FLEXCAN0_MBn_ID(buffer) = FLEXCAN_MB_ID_IDSTD(msg.id);
+  }
   FLEXCAN0_MBn_WORD0(buffer) = (msg.buf[0]<<24)|(msg.buf[1]<<16)|(msg.buf[2]<<8)|msg.buf[3];
   FLEXCAN0_MBn_WORD1(buffer) = (msg.buf[4]<<24)|(msg.buf[5]<<16)|(msg.buf[6]<<8)|msg.buf[7];
-  FLEXCAN0_MBn_CS(buffer) = FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_ONCE)
+  if(msg.ext) {
+    FLEXCAN0_MBn_CS(buffer) = FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_ONCE)
+                      | FLEXCAN_MB_CS_LENGTH(msg.len) | FLEXCAN_MB_CS_SRR | FLEXCAN_MB_CS_IDE;
+  } else {
+    FLEXCAN0_MBn_CS(buffer) = FLEXCAN_MB_CS_CODE(FLEXCAN_MB_CODE_TX_ONCE)
                       | FLEXCAN_MB_CS_LENGTH(msg.len);
+  }
 
   return 1;
 }
