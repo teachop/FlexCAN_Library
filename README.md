@@ -11,8 +11,6 @@ Note that CAN will normally not work without termination resistors.
 
 Supported baud rates are 125000, 250000, 500000, and 1000000 bits per second.  If the baud rate is not specified it will default to 125000.
 
-**TODO**  Extended identifiers and receive filtering have recently been contributed and are working.  Please help provide additional testing of these features and give feedback.
-
 ###Driver API
 **begin()**
 Enable the CAN to start actively participating on the CANbus.
