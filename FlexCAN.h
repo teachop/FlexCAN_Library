@@ -2,6 +2,9 @@
 // a simple Arduino Teensy3.1 CAN driver
 // by teachop
 //
+#ifndef __FLEXCAN_H__
+#define __FLEXCAN_H__
+
 #include <Arduino.h>
 
 typedef struct CAN_message_t {
@@ -39,3 +42,4 @@ public:
 
 };
 
+#endif // __FLEXCAN_H__
