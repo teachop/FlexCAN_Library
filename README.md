@@ -13,7 +13,8 @@ Supported baud rates are 125000, 250000, 500000, and 1000000 bits per second.  I
 
 ###Known working CAN Transceivers
 Please add parts you are using with Teensy3.1 to this list.
-- SN65HVD232QDQ1
+- TI SN65HVD232QDQ1 on 3.3V.
+- NXP TJA1050T/VM,118. This is powered by the same 5V supply as the Teensy.
 
 ###Driver API
 **begin()**
