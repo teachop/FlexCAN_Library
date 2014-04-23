@@ -11,6 +11,10 @@ Note that CAN will normally not work without termination resistors.
 
 Supported baud rates are 125000, 250000, 500000, and 1000000 bits per second.  If the baud rate is not specified it will default to 125000.
 
+###Known working CAN Transceivers
+Please add parts you are using with Teensy3.1 to this list.
+- SN65HVD232QDQ1
+
 ###Driver API
 **begin()**
 Enable the CAN to start actively participating on the CANbus.
