@@ -1131,8 +1131,8 @@ typedef volatile uint32_t vuint32_t;
 #define FLEXCAN_RERRSYNR_SYND0_BIT_NO	(0)
 
 #define FLEXCAN_RERRSYNR_check_BEn_Bit(errsynr,n) (errsynr & FLEXCAN_RERRSYNR_BE##n##_MASK)
-#define FLEXCAN_RERRSYNR_get_SYNDn(errsynr,n) (errsynr & FLEXCAN_RERRSYNR_BE##n##_MASK)
-#define FLEXCAN_RERRSYNR_check_BEn_Bit(errsynr,n) ((errsynr & FLEXCAN_RERRSYNR_BE##n##_MASK)>>FLEXCAN_RERRSYNR_SYND##n##_BIT_NO)
+#define FLEXCAN_RERRSYNR_get_SYNDn(errsynr,n) (errsynr & FLEXCAN_RERRSYNR_SYND##n##_MASK)
+#define FLEXCAN_RERRSYNR_check_SYNDn_Bit(errsynr,n) ((errsynr & FLEXCAN_RERRSYNR_SYND##n##_MASK)>>FLEXCAN_RERRSYNR_SYND##n##_BIT_NO)
 
 /* Bit definition for Error Status Register (ERRSR) */
 #define FLEXCAN_ERRSR_CEIOF_MASK	(0x00000001)

@@ -121,9 +121,8 @@ int FlexCAN::available(void)
 int FlexCAN::read(CAN_message_t &msg)
 {
   unsigned long int startMillis;
-  if ( msg.timeout ) {
-    startMillis = millis();
-  }
+
+  startMillis = msg.timeout? millis() : 0;
 
   while( !available() ) {
     if ( !msg.timeout || (msg.timeout<=(millis()-startMillis)) ) {
@@ -175,9 +174,8 @@ int FlexCAN::read(CAN_message_t &msg)
 int FlexCAN::write(const CAN_message_t &msg)
 {
   unsigned long int startMillis;
-  if ( msg.timeout ) {
-    startMillis = millis();
-  }
+
+  startMillis = msg.timeout? millis() : 0;
 
   // find an available buffer
   int buffer = -1;
