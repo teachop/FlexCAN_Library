@@ -16,6 +16,7 @@ Please add parts you are using successfully with Teensy 3.1 to this list.
 - TI SN65HVD230D on 3.3V (1MBPS)
 - TI SN65HVD232D / SN65HVD232QDQ1 on 3.3V (1MBPS)
 - NXP TJA1050T/VM,118 on the same 5V supply as the Teensy. (1MBPS)
+- Microchip MCP2551 on 5V (reported at 500KBPS)
 
 ###Driver API
 **begin()**
