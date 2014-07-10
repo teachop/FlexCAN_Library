@@ -11,8 +11,6 @@ Note that CAN will normally not work without termination resistors.
 
 Supported baud rates are 125000, 250000, 500000, and 1000000 bits per second.  If the baud rate is not specified it will default to 125000.
 
-Please note that **only CPU speeds 48, 96 and 144 are supported** presently.
-
 ###CAN Transceiver Options
 Please add parts you are using successfully with Teensy 3.1 to this list.
 - TI SN65HVD230D on 3.3V (1MBPS)
