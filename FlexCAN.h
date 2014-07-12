@@ -7,11 +7,6 @@
 
 #include <Arduino.h>
 
-// in the short term insure 48MHz bus speed
-#if F_BUS != 48000000
-#error "Only CPU speeds 48, 96 and 144 are supported"
-#endif
-
 typedef struct CAN_message_t {
   uint32_t id; // can identifier
   uint8_t ext; // identifier is extended

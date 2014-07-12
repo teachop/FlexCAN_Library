@@ -15,9 +15,10 @@ FlexCAN::FlexCAN(uint32_t baud)
   // set up the pins, 3=PTA12=CAN0_TX, 4=PTA13=CAN0_RX
   CORE_PIN3_CONFIG = PORT_PCR_MUX(2);
   CORE_PIN4_CONFIG = PORT_PCR_MUX(2);// | PORT_PCR_PE | PORT_PCR_PS;
-  // select clock source
+  // select clock source 16MHz xtal
+  OSC0_CR |= OSC_ERCLKEN;
   SIM_SCGC6 |=  SIM_SCGC6_FLEXCAN0;
-  FLEXCAN0_CTRL1 |= FLEXCAN_CTRL_CLK_SRC;
+  FLEXCAN0_CTRL1 &= ~FLEXCAN_CTRL_CLK_SRC;
 
   // enable CAN
   FLEXCAN0_MCR |=  FLEXCAN_MCR_FRZ;
@@ -37,19 +38,19 @@ FlexCAN::FlexCAN(uint32_t baud)
   //enable RX FIFO
   FLEXCAN0_MCR |= FLEXCAN_MCR_FEN;
 
-  // segment timings from freescale loopback test
+  // segment splits and clock divisor based on baud rate
   if ( 250000 == baud ) {
     FLEXCAN0_CTRL1 = (FLEXCAN_CTRL_PROPSEG(2) | FLEXCAN_CTRL_RJW(1)
-                      | FLEXCAN_CTRL_PSEG1(3) | FLEXCAN_CTRL_PSEG2(3) | FLEXCAN_CTRL_PRESDIV(15));
+                      | FLEXCAN_CTRL_PSEG1(7) | FLEXCAN_CTRL_PSEG2(3) | FLEXCAN_CTRL_PRESDIV(3));
   } else if ( 500000 == baud ) {
     FLEXCAN0_CTRL1 = (FLEXCAN_CTRL_PROPSEG(2) | FLEXCAN_CTRL_RJW(1)
-                      | FLEXCAN_CTRL_PSEG1(3) | FLEXCAN_CTRL_PSEG2(3) | FLEXCAN_CTRL_PRESDIV(7));
+                      | FLEXCAN_CTRL_PSEG1(7) | FLEXCAN_CTRL_PSEG2(3) | FLEXCAN_CTRL_PRESDIV(1));
   } else if ( 1000000 == baud ) {
-    FLEXCAN0_CTRL1 = (FLEXCAN_CTRL_PROPSEG(3) | FLEXCAN_CTRL_RJW(0)
-                      | FLEXCAN_CTRL_PSEG1(0) | FLEXCAN_CTRL_PSEG2(1) | FLEXCAN_CTRL_PRESDIV(5));
+    FLEXCAN0_CTRL1 = (FLEXCAN_CTRL_PROPSEG(2) | FLEXCAN_CTRL_RJW(0)
+                      | FLEXCAN_CTRL_PSEG1(1) | FLEXCAN_CTRL_PSEG2(1) | FLEXCAN_CTRL_PRESDIV(1));
   } else { // 125000
-    FLEXCAN0_CTRL1 = (FLEXCAN_CTRL_PROPSEG(2) | FLEXCAN_CTRL_RJW(2)
-                      | FLEXCAN_CTRL_PSEG1(3) | FLEXCAN_CTRL_PSEG2(3) | FLEXCAN_CTRL_PRESDIV(31));
+    FLEXCAN0_CTRL1 = (FLEXCAN_CTRL_PROPSEG(2) | FLEXCAN_CTRL_RJW(1)
+                      | FLEXCAN_CTRL_PSEG1(7) | FLEXCAN_CTRL_PSEG2(3) | FLEXCAN_CTRL_PRESDIV(7));
   }
 
   // Default mask is allow everything
