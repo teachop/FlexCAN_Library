@@ -3,7 +3,9 @@
 ###Introduction
 FlexCAN is a serial communication driver for the CAN0 peripheral built into the Teensy 3.1 CPU.  The driver is organized in the Arduino library format.
 
-When the FlexCAN object is constructed, Arduino pins Digital 3 and Digital 4 (Teensy module connections 5 and 6) are assigned to CAN functions.  These should be wired to a 3.3V CAN transceiver TXD and RXD respectively to allow connection of the Teensy 3.1 to a CAN network.
+When the FlexCAN object is constructed, Arduino pins Digital 3 and Digital 4 are assigned to CAN functions TX and RX.  These should be wired to a 3.3V CAN transceiver TXD and RXD respectively to allow connection of the Teensy 3.1 to a CAN network.
+
+![Teensy 3.1 CAN Pins, Digital3=TX, Digital4=RX](/FlexCAN_pins.png)
 
 Even though the Teensy is operating on 3.3V, use of 5V transceivers may be an option if the system has regulated +5V available.  The CAN RXD input on the CPU is 5V tolerant and most 5V transceivers will accept the 3V TXD signal.  This is a good choice for breadboarding due to availability of thru-hole 5V transceiver parts.
 
