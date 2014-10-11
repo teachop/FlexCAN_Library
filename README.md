@@ -11,7 +11,7 @@ Even though the Teensy is operating on 3.3V, use of 5V transceivers may be an op
 
 Note that CAN will normally not work without termination resistors.
 
-Supported baud rates are 125000, 250000, 500000, and 1000000 bits per second.  If the baud rate is not specified it will default to 125000.
+Supported baud rates are 50000, 100000, 125000, 250000, 500000, and 1000000 bits per second.  If the baud rate is not specified it will default to 125000.
 
 ###CAN Transceiver Options
 Please add parts you are using successfully with Teensy 3.1 to this list.

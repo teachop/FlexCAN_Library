@@ -39,7 +39,13 @@ FlexCAN::FlexCAN(uint32_t baud)
   FLEXCAN0_MCR |= FLEXCAN_MCR_FEN;
 
   // segment splits and clock divisor based on baud rate
-  if ( 250000 == baud ) {
+  if ( 50000 == baud ) {
+    FLEXCAN0_CTRL1 = (FLEXCAN_CTRL_PROPSEG(2) | FLEXCAN_CTRL_RJW(1)
+                      | FLEXCAN_CTRL_PSEG1(7) | FLEXCAN_CTRL_PSEG2(3) | FLEXCAN_CTRL_PRESDIV(19));
+  } else if ( 100000 == baud ) {
+    FLEXCAN0_CTRL1 = (FLEXCAN_CTRL_PROPSEG(2) | FLEXCAN_CTRL_RJW(1)
+                      | FLEXCAN_CTRL_PSEG1(7) | FLEXCAN_CTRL_PSEG2(3) | FLEXCAN_CTRL_PRESDIV(9));
+  } else if ( 250000 == baud ) {
     FLEXCAN0_CTRL1 = (FLEXCAN_CTRL_PROPSEG(2) | FLEXCAN_CTRL_RJW(1)
                       | FLEXCAN_CTRL_PSEG1(7) | FLEXCAN_CTRL_PSEG2(3) | FLEXCAN_CTRL_PRESDIV(3));
   } else if ( 500000 == baud ) {
